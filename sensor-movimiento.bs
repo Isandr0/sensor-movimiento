@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import RPi.GPIO as GPIO
+import time
+
+# Configuración del sensor
+PIR_PIN = 4  # Pin GPIO donde está conectado el sensor (ajustar según tu conexión)
+LED_PIN = 17 # Pin opcional para un LED indicador
+
+def setup():
+    GPIO.setmode(GPIO.BCM)  # Usar numeración BCM de GPIO
+    GPIO.setup(PIR_PIN, GPIO.IN)
+    GPIO.setup(LED_PIN, GPIO.OUT)
+    GPIO.output(LED_PIN, GPIO.LOW)
+    
+    print("Sensor de movimiento inicializado")
+    print("Esperando a que el sensor se estabilice...")
+    time.sleep(20)  # Tiempo para que el sensor PIR se estabilice
+    print("Listo para detectar movimiento")
+
+def main():
+    try:
+        while True:
+            if GPIO.input(PIR_PIN):
+                print("¡Movimiento detectado!")
+                GPIO.output(LED_PIN, GPIO.HIGH)  # Encender LED
+                time.sleep(1)  # Evitar múltiples detecciones rápidas
+            else:
+                GPIO.output(LED_PIN, GPIO.LOW)  # Apagar LED
+                
+            time.sleep(0.1)  # Pequeña pausa para reducir uso de CPU
+            
+    except KeyboardInterrupt:
+        print("Deteniendo el script...")
+        GPIO.cleanup()  # Limpiar configuración de GPIO
+
+if _name_ == '_main_':
+    setup()
+    main()
